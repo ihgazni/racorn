@@ -16,8 +16,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 // See https://github.com/mozilla/sweet.js/wiki/design
 
 var TokContext = exports.TokContext = function TokContext(token, isExpr, preserveSpace, override, generator) {
+   ////
+   console.log("tokencontext.js->TokContext->")
+  ////
   _classCallCheck(this, TokContext);
-
   this.token = token;
   this.isExpr = !!isExpr;
   this.preserveSpace = !!preserveSpace;
@@ -43,10 +45,16 @@ var types = exports.types = {
 var pp = _state.Parser.prototype;
 
 pp.initialContext = function () {
+  ////
+  console.log("tokencontext->pp.initialContext->")
+  ////
   return [types.b_stat];
 };
 
 pp.braceIsBlock = function (prevType) {
+  ////
+  console.log("tokencontext->pp.braceIsBlock->")
+  ////
   var parent = this.curContext();
   if (parent === types.f_expr || parent === types.f_stat) return true;
   if (prevType === _tokentype.types.colon && (parent === types.b_stat || parent === types.b_expr)) return !parent.isExpr;
@@ -62,6 +70,9 @@ pp.braceIsBlock = function (prevType) {
 };
 
 pp.inGeneratorContext = function () {
+  ////
+  console.log("tokencontext->pp.inGeneratorContext->")
+  ////
   for (var i = this.context.length - 1; i >= 1; i--) {
     var context = this.context[i];
     if (context.token === "function") return context.generator;
@@ -70,6 +81,9 @@ pp.inGeneratorContext = function () {
 };
 
 pp.updateContext = function (prevType) {
+  ////
+  console.log("tokencontext->pp.updateContext->")
+  ////
   var update = void 0,
       type = this.type;
   if (type.keyword && prevType === _tokentype.types.dot) this.exprAllowed = false;else if (update = type.updateContext) update.call(this, prevType);else this.exprAllowed = type.beforeExpr;
@@ -78,6 +92,9 @@ pp.updateContext = function (prevType) {
 // Token-specific context update code
 
 _tokentype.types.parenR.updateContext = _tokentype.types.braceR.updateContext = function () {
+  ////
+  console.log("tokencontext->_tokentype.types.parenR.updateContext->")
+  ////
   if (this.context.length === 1) {
     this.exprAllowed = true;
     return;
@@ -90,6 +107,9 @@ _tokentype.types.parenR.updateContext = _tokentype.types.braceR.updateContext = 
 };
 
 _tokentype.types.braceL.updateContext = function (prevType) {
+  ////
+  console.log("tokencontext->_tokentype.types.braceL.updateContext->")
+  ////
   this.context.push(this.braceIsBlock(prevType) ? types.b_stat : types.b_expr);
   this.exprAllowed = true;
 };

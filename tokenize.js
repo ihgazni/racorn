@@ -30,8 +30,10 @@ var Token = exports.Token = function Token(p) {
   this.value = p.value;
   this.start = p.start;
   this.end = p.end;
-  if (p.options.locations) this.loc = new _locutil.SourceLocation(p, p.startLoc, p.endLoc);
-  if (p.options.ranges) this.range = [p.start, p.end];
+  if (p.options.locations) 
+	this.loc = new _locutil.SourceLocation(p, p.startLoc, p.endLoc);
+  if (p.options.ranges) 
+	this.range = [p.start, p.end];
 };
 
 // ## Tokenizer
@@ -41,8 +43,8 @@ var pp = _state.Parser.prototype;
 // Move to the next token
 
 pp.next = function () {
-  if (this.options.onToken) this.options.onToken(new Token(this));
-
+  if (this.options.onToken) 
+	this.options.onToken(new Token(this));
   this.lastTokEnd = this.end;
   this.lastTokStart = this.start;
   this.lastTokEndLoc = this.endLoc;
@@ -92,21 +94,43 @@ pp.nextToken = function () {
 };
 
 pp.readToken = function (code) {
+   //// code is charCode
+   //// -dli
+   console.log("tokenize.js->pp.readToken->")
+   //console.log(_identifier.isIdentifierStart)
+   //console.log(code)
+   //// -dli
+  	
   // Identifier or keyword. '\uXXXX' sequences are allowed in
   // identifiers, so '\' also dispatches to that.
-  if ((0, _identifier.isIdentifierStart)(code, this.options.ecmaVersion >= 6) || code === 92 /* '\' */) return this.readWord();
+  if (
+	  (0, _identifier.isIdentifierStart)(code, this.options.ecmaVersion >= 6) 
+	  ////_identifier.isIdentifierStart [Function: isIdentifierStart]
+	  ////TypeError: 0 is not a function, 这个写法的作用是抛出TypeError
+	  ||
+	  //// 92 是转义字符
+	  code === 92 /* '\' */
+     ) 
+     return this.readWord();
 
   return this.getTokenFromCode(code);
 };
 
 pp.fullCharCodeAtPos = function () {
+  ////
+  console.log("tokenize.js->pp.fullCharCodeAtPos->")
+  ////
   var code = this.input.charCodeAt(this.pos);
-  if (code <= 0xd7ff || code >= 0xe000) return code;
+  if (code <= 0xd7ff || code >= 0xe000) 
+	return code;
   var next = this.input.charCodeAt(this.pos + 1);
   return (code << 10) + next - 0x35fdc00;
 };
 
 pp.skipBlockComment = function () {
+  ////
+  console.log("tokenize.js->pp.skipBlockComment->")
+  ////
   var startLoc = this.options.onComment && this.curPosition();
   var start = this.pos,
       end = this.input.indexOf("*/", this.pos += 2);
@@ -124,6 +148,9 @@ pp.skipBlockComment = function () {
 };
 
 pp.skipLineComment = function (startSkip) {
+  ////
+  console.log("tokenize.js->pp.skipLineComment->")
+  ////
   var start = this.pos;
   var startLoc = this.options.onComment && this.curPosition();
   var ch = this.input.charCodeAt(this.pos += startSkip);
@@ -137,6 +164,9 @@ pp.skipLineComment = function (startSkip) {
 // whitespace and comments, and.
 
 pp.skipSpace = function () {
+  ////
+  console.log("tokenize.js->pp.skipSpace->")
+  ////
   loop: while (this.pos < this.input.length) {
     var ch = this.input.charCodeAt(this.pos);
     switch (ch) {
@@ -185,6 +215,9 @@ pp.skipSpace = function () {
 // right position.
 
 pp.finishToken = function (type, val) {
+  ////
+   console.log("tokenize.js->pp.finishToken->")
+  ////
   this.end = this.pos;
   if (this.options.locations) this.endLoc = this.curPosition();
   var prevType = this.type;
@@ -204,6 +237,10 @@ pp.finishToken = function (type, val) {
 // All in the name of speed.
 //
 pp.readToken_dot = function () {
+  ////
+   console.log("tokenize.js->pp.readToken_dot->")
+  ////
+
   var next = this.input.charCodeAt(this.pos + 1);
   if (next >= 48 && next <= 57) return this.readNumber(true);
   var next2 = this.input.charCodeAt(this.pos + 2);
@@ -218,6 +255,10 @@ pp.readToken_dot = function () {
 };
 
 pp.readToken_slash = function () {
+  ////
+   console.log("tokenize.js->pp.readToken_slash->")
+  ////
+
   // '/'
   var next = this.input.charCodeAt(this.pos + 1);
   if (this.exprAllowed) {
@@ -228,6 +269,10 @@ pp.readToken_slash = function () {
 };
 
 pp.readToken_mult_modulo_exp = function (code) {
+  ////
+   console.log("tokenize.js->pp.readToken_mult_modulo_exp->")
+  ////
+
   // '%*'
   var next = this.input.charCodeAt(this.pos + 1);
   var size = 1;
@@ -245,6 +290,9 @@ pp.readToken_mult_modulo_exp = function (code) {
 };
 
 pp.readToken_pipe_amp = function (code) {
+  ////
+   console.log("tokenize.js->pp.readToken_pipe_amp->")
+  ////
   // '|&'
   var next = this.input.charCodeAt(this.pos + 1);
   if (next === code) return this.finishOp(code === 124 ? _tokentype.types.logicalOR : _tokentype.types.logicalAND, 2);
@@ -253,6 +301,9 @@ pp.readToken_pipe_amp = function (code) {
 };
 
 pp.readToken_caret = function () {
+  ////
+   console.log("tokenize.js->pp.readToken_caret->")
+  ////
   // '^'
   var next = this.input.charCodeAt(this.pos + 1);
   if (next === 61) return this.finishOp(_tokentype.types.assign, 2);
@@ -260,6 +311,9 @@ pp.readToken_caret = function () {
 };
 
 pp.readToken_plus_min = function (code) {
+  ////
+   console.log("tokenize.js->pp.readToken_plus_min->")
+  ////
   // '+-'
   var next = this.input.charCodeAt(this.pos + 1);
   if (next === code) {
@@ -276,6 +330,9 @@ pp.readToken_plus_min = function (code) {
 };
 
 pp.readToken_lt_gt = function (code) {
+  ////
+   console.log("tokenize.js->pp.readToken_lt_gt->")
+  ////
   // '<>'
   var next = this.input.charCodeAt(this.pos + 1);
   var size = 1;
@@ -295,6 +352,10 @@ pp.readToken_lt_gt = function (code) {
 };
 
 pp.readToken_eq_excl = function (code) {
+  ////
+   console.log("tokenize.js->pp.readToken_eq_excl->")
+  ////
+
   // '=!'
   var next = this.input.charCodeAt(this.pos + 1);
   if (next === 61) return this.finishOp(_tokentype.types.equality, this.input.charCodeAt(this.pos + 2) === 61 ? 3 : 2);
@@ -307,6 +368,10 @@ pp.readToken_eq_excl = function (code) {
 };
 
 pp.getTokenFromCode = function (code) {
+  ////
+   console.log("tokenize.js->pp.getTokenFromCode->")
+  ////
+
   switch (code) {
     // The interpretation of a dot depends on whether it is followed
     // by a digit or another two dots.
@@ -404,12 +469,19 @@ pp.getTokenFromCode = function (code) {
 };
 
 pp.finishOp = function (type, size) {
+  ////
+   console.log("tokenize.js->pp.finishOp->")
+  ////
+
   var str = this.input.slice(this.pos, this.pos + size);
   this.pos += size;
   return this.finishToken(type, str);
 };
 
 pp.readRegexp = function () {
+  ////
+   console.log("tokenize.js->pp.readRegexp->")
+  ////
   var escaped = void 0,
       inClass = void 0,
       start = this.pos;
@@ -452,6 +524,10 @@ pp.readRegexp = function () {
 // will return `null` unless the integer has exactly `len` digits.
 
 pp.readInt = function (radix, len) {
+  ////
+   console.log("tokenize.js->pp.readInt->")
+  ////
+
   var start = this.pos,
       total = 0;
   for (var i = 0, e = len == null ? Infinity : len; i < e; ++i) {
@@ -471,6 +547,9 @@ pp.readInt = function (radix, len) {
 };
 
 pp.readRadixNumber = function (radix) {
+  ////
+   console.log("tokenize.js->pp.readRadixNumber->")
+  ////
   this.pos += 2; // 0x
   var val = this.readInt(radix);
   if (val == null) this.raise(this.start + 2, "Expected number in radix " + radix);
@@ -481,6 +560,9 @@ pp.readRadixNumber = function (radix) {
 // Read an integer, octal integer, or floating-point number.
 
 pp.readNumber = function (startsWithDot) {
+  ////
+   console.log("tokenize.js->pp.readNumber->")
+  ////
   var start = this.pos;
   if (!startsWithDot && this.readInt(10) === null) this.raise(start, "Invalid number");
   var octal = this.pos - start >= 2 && this.input.charCodeAt(start) === 48;
@@ -509,6 +591,10 @@ pp.readNumber = function (startsWithDot) {
 // Read a string value, interpreting backslash-escapes.
 
 pp.readCodePoint = function () {
+  ////
+   console.log("tokenize.js->pp.readCodePoint->")
+  ////
+
   var ch = this.input.charCodeAt(this.pos),
       code = void 0;
 
@@ -526,6 +612,8 @@ pp.readCodePoint = function () {
 };
 
 function codePointToString(code) {
+  ////
+  ////
   // UTF-16 Decoding
   if (code <= 0xFFFF) return String.fromCharCode(code);
   code -= 0x10000;
@@ -533,6 +621,10 @@ function codePointToString(code) {
 }
 
 pp.readString = function (quote) {
+  ////
+   console.log("tokenize.js->pp.readString->")
+  ////
+
   var out = "",
       chunkStart = ++this.pos;
   for (;;) {
@@ -558,6 +650,9 @@ pp.readString = function (quote) {
 var INVALID_TEMPLATE_ESCAPE_ERROR = {};
 
 pp.tryReadTemplateToken = function () {
+  ////
+   console.log("tokenize.js->pp.tryReadTemplateToken->")
+  ////
   this.inTemplateElement = true;
   try {
     this.readTmplToken();
@@ -573,6 +668,9 @@ pp.tryReadTemplateToken = function () {
 };
 
 pp.invalidStringToken = function (position, message) {
+  ////
+   console.log("tokenize.js->pp.invalidStringToken->")
+  ////
   if (this.inTemplateElement && this.options.ecmaVersion >= 9) {
     throw INVALID_TEMPLATE_ESCAPE_ERROR;
   } else {
@@ -581,6 +679,10 @@ pp.invalidStringToken = function (position, message) {
 };
 
 pp.readTmplToken = function () {
+  ////
+   console.log("tokenize.js->pp.readTmplToken->")
+  ////
+
   var out = "",
       chunkStart = this.pos;
   for (;;) {
@@ -631,6 +733,9 @@ pp.readTmplToken = function () {
 
 // Reads a template token to search for the end, without validating any escape sequences
 pp.readInvalidTemplateToken = function () {
+  ////
+   console.log("tokenize.js->pp.readInvalidTemplateToken->")
+  ////
   for (; this.pos < this.input.length; this.pos++) {
     switch (this.input[this.pos]) {
       case "\\":
@@ -655,6 +760,9 @@ pp.readInvalidTemplateToken = function () {
 // Used to read escaped characters
 
 pp.readEscapedChar = function (inTemplate) {
+  ////
+   console.log("tokenize.js->pp.readEscapedChar->")
+  ////
   var ch = this.input.charCodeAt(++this.pos);
   ++this.pos;
   switch (ch) {
@@ -704,6 +812,9 @@ pp.readEscapedChar = function (inTemplate) {
 // Used to read character escape sequences ('\x', '\u', '\U').
 
 pp.readHexChar = function (len) {
+  ////
+   console.log("tokenize.js->pp.readHexChar->")
+  ////
   var codePos = this.pos;
   var n = this.readInt(16, len);
   if (n === null) this.invalidStringToken(codePos, "Bad character escape sequence");
@@ -717,6 +828,9 @@ pp.readHexChar = function (len) {
 // as a micro-optimization.
 
 pp.readWord1 = function () {
+  ////
+   console.log("tokenize.js->pp.readWord1->")
+  ////
   this.containsEsc = false;
   var word = "",
       first = true,
@@ -750,6 +864,9 @@ pp.readWord1 = function () {
 // words when necessary.
 
 pp.readWord = function () {
+  ////
+   console.log("tokenize.js->pp.readWord->")
+  ////
   var word = this.readWord1();
   var type = _tokentype.types.name;
   if (this.keywords.test(word)) {
@@ -758,3 +875,13 @@ pp.readWord = function () {
   }
   return this.finishToken(type, word);
 };
+
+
+////dli
+//
+//
+exports._classCallCheck = _classCallCheck
+exports.codePointToString = codePointToString
+//
+//
+////dli
