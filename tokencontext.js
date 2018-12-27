@@ -115,39 +115,90 @@ _tokentype.types.braceL.updateContext = function (prevType) {
 };
 
 _tokentype.types.dollarBraceL.updateContext = function () {
+  ////
+  console.log("tokencontext->_tokentype.types.dollarBraceL.updateContext->")
+  ////
+
   this.context.push(types.b_tmpl);
   this.exprAllowed = true;
 };
 
 _tokentype.types.parenL.updateContext = function (prevType) {
+  ////
+  console.log("tokencontext->_tokentype.types.parenL.updateContext->")
+  ////
+
   var statementParens = prevType === _tokentype.types._if || prevType === _tokentype.types._for || prevType === _tokentype.types._with || prevType === _tokentype.types._while;
   this.context.push(statementParens ? types.p_stat : types.p_expr);
   this.exprAllowed = true;
 };
 
 _tokentype.types.incDec.updateContext = function () {
+  ////
+  console.log("tokencontext->_tokentype.types.incDec.updateContext->")
+  ////
   // tokExprAllowed stays unchanged
 };
 
 _tokentype.types._function.updateContext = _tokentype.types._class.updateContext = function (prevType) {
-  if (prevType.beforeExpr && prevType !== _tokentype.types.semi && prevType !== _tokentype.types._else && !(prevType === _tokentype.types._return && _whitespace.lineBreak.test(this.input.slice(this.lastTokEnd, this.start))) && !((prevType === _tokentype.types.colon || prevType === _tokentype.types.braceL) && this.curContext() === types.b_stat)) this.context.push(types.f_expr);else this.context.push(types.f_stat);
+   ////
+  console.log("tokencontext->_tokentype.types._function.updateContext->")
+  ////
+
+
+  if (
+	  prevType.beforeExpr 
+	  && 
+	  prevType !== _tokentype.types.semi 
+	  && 
+	  prevType !== _tokentype.types._else 
+	  && 
+	  !(
+	       prevType === _tokentype.types._return 
+	       &&
+	       _whitespace.lineBreak.test(this.input.slice(this.lastTokEnd, this.start))) 
+	       && 
+	       !(
+	            (
+			  prevType === _tokentype.types.colon 
+			  || 
+			  prevType === _tokentype.types.braceL
+		    ) 
+		    && 
+		    this.curContext() === types.b_stat
+	       )
+     ) 
+     this.context.push(types.f_expr);
+   else 
+       this.context.push(types.f_stat);
   this.exprAllowed = false;
 };
 
 _tokentype.types.backQuote.updateContext = function () {
+   ////
+  console.log("tokencontext->_tokentype.types.backQuote.updateContext->")
+  ////
   if (this.curContext() === types.q_tmpl) this.context.pop();else this.context.push(types.q_tmpl);
   this.exprAllowed = false;
 };
 
 _tokentype.types.star.updateContext = function (prevType) {
+   ////
+  console.log("tokencontext->_tokentype.types.star.updateContext->")
+  ////
   if (prevType === _tokentype.types._function) {
     var index = this.context.length - 1;
-    if (this.context[index] === types.f_expr) this.context[index] = types.f_expr_gen;else this.context[index] = types.f_gen;
+    if (this.context[index] === types.f_expr) 
+	  this.context[index] = types.f_expr_gen;
+    else this.context[index] = types.f_gen;
   }
   this.exprAllowed = true;
 };
 
 _tokentype.types.name.updateContext = function (prevType) {
+   ////
+  console.log("tokencontext->_tokentype.types.name.updateContext->")
+  ////
   var allowed = false;
   if (this.options.ecmaVersion >= 6 && prevType !== _tokentype.types.dot) {
     if (this.value === "of" && !this.exprAllowed || this.value === "yield" && this.inGeneratorContext()) allowed = true;
